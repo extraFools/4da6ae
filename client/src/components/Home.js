@@ -66,7 +66,6 @@ const Home = ({ user, logout }) => {
   const postMessage = async(body) => {
     try {
       const data = await(saveMessage(body));
-      console.log(data);
       if (!body.conversationId) {
         addNewConvo(body.recipientId, data.message);
       } else {
@@ -151,7 +150,7 @@ const Home = ({ user, logout }) => {
     );
   }, []);
 
-  
+
   // Lifecycle
   useEffect(() => {
     // Socket init
