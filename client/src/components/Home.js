@@ -54,11 +54,12 @@ const Home = ({ user, logout }) => {
     return data;
   };
 
-  const sendMessage = (data, body) => {
+  const sendMessage = async (data, body) => {
+    const resolvedData = await(await data); //Get data from data promise
     socket.emit('new-message', {
-      message: data.message,
+      message: resolvedData.message,
       recipientId: body.recipientId,
-      sender: data.sender,
+      sender: resolvedData.sender,
     });
   };
 
@@ -71,8 +72,8 @@ const Home = ({ user, logout }) => {
       } else {
         addMessageToConversation(data);
       }
-
       sendMessage(data, body);
+      
     } catch (error) {
       console.error(error);
     }
@@ -93,9 +94,10 @@ const Home = ({ user, logout }) => {
   );
 
   const addMessageToConversation = useCallback(
-    (data) => {
+    async (data) => { 
       // if sender isn't null, that means the message needs to be put in a brand new convo
-      const { message, sender = null } = data;
+      const resolvedData = await(await data);
+      const { message, sender = null } = resolvedData;
       if (sender !== null) {
         const newConvo = {
           id: message.conversationId,
@@ -105,14 +107,19 @@ const Home = ({ user, logout }) => {
         newConvo.latestMessageText = message.text;
         setConversations((prev) => [newConvo, ...prev]);
       }
+      
+      // conversations.forEach((convo) => {
+      //   if (convo.id === message.conversationId) {
+      //     convo.messages.push(message);
+      //     convo.latestMessageText = message.text;
+      //   }
+      // });
 
-      conversations.forEach((convo) => {
-        if (convo.id === message.conversationId) {
-          convo.messages.push(message);
-          convo.latestMessageText = message.text;
-        }
-      });
-      setConversations(conversations);
+      const convos = [...conversations];
+      const index = conversations.findIndex((con) => con.id === message.conversationId);
+      const currMessages = convos[index].messages.concat(message);
+      convos[index].messages = currMessages;
+      setConversations(convos);
     },
     [setConversations, conversations]
   );
@@ -120,7 +127,7 @@ const Home = ({ user, logout }) => {
   const setActiveChat = (username) => {
     setActiveConversation(username);
   };
-
+  
   const addOnlineUser = useCallback((id) => {
     setConversations((prev) =>
       prev.map((convo) => {
@@ -149,8 +156,8 @@ const Home = ({ user, logout }) => {
     );
   }, []);
 
+  
   // Lifecycle
-
   useEffect(() => {
     // Socket init
     socket.on('add-online-user', addOnlineUser);
