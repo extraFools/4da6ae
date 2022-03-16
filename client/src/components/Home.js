@@ -54,25 +54,23 @@ const Home = ({ user, logout }) => {
     return data;
   };
 
-  const sendMessage = async (data, body) => {
-    const resolvedData = await(await data); //Get data from data promise
+  const sendMessage = (data, body) => {
     socket.emit('new-message', {
-      message: resolvedData.message,
+      message: data.message,
       recipientId: body.recipientId,
-      sender: resolvedData.sender,
+      sender: data.sender,
     });
   };
 
-  const postMessage = async(body) => {
+  const postMessage = async (body) => {
     try {
-      const data = await(saveMessage(body));
+      const data = await saveMessage(body);
       if (!body.conversationId) {
         addNewConvo(body.recipientId, data.message);
       } else {
         addMessageToConversation(data);
       }
       sendMessage(data, body);
-      
     } catch (error) {
       console.error(error);
     }
@@ -80,24 +78,27 @@ const Home = ({ user, logout }) => {
 
   const addNewConvo = useCallback(
     (recipientId, message) => {
-      conversations.forEach((convo) => {
-        if (convo.otherUser.id === recipientId) {
-          convo.messages.push(message);
-          convo.latestMessageText = message.text;
-          convo.id = message.conversationId;
-        }
-      });
-      const convos = [...conversations];
-      setConversations(convos);
+      setConversations((prev) =>
+        prev.map((convo) => {
+          if (convo.otherUser.id === recipientId) {
+            const convoCopy = { ...convo };
+            convoCopy.messages.push(message);
+            convoCopy.latestMessageText = message.text;
+            convoCopy.id = message.conversationId;
+            return convoCopy;
+          } else {
+            return convo;
+          }
+        })
+      );
     },
     [setConversations, conversations]
   );
 
   const addMessageToConversation = useCallback(
-    async (data) => { 
+    (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
-      const resolvedData = await(await data);
-      const { message, sender = null } = resolvedData;
+      const { message, sender = null } = data;
       if (sender !== null) {
         const newConvo = {
           id: message.conversationId,
@@ -107,13 +108,18 @@ const Home = ({ user, logout }) => {
         newConvo.latestMessageText = message.text;
         setConversations((prev) => [newConvo, ...prev]);
       }
-      
-      const convos = [...conversations];
-      const index = conversations.findIndex((con) => con.id === message.conversationId);
-      const currMessages = convos[index].messages.concat(message);
-      convos[index].messages = currMessages;
-
-      setConversations(convos);
+      setConversations((prev) =>
+        prev.map((convo) => {
+          if (convo.id === message.conversationId) {
+            const convoCopy = { ...convo };
+            convoCopy.messages.push(message);
+            convoCopy.latestMessageText = message.text;
+            return convoCopy;
+          } else {
+            return convo;
+          }
+        })
+      );
     },
     [setConversations, conversations]
   );
@@ -121,7 +127,7 @@ const Home = ({ user, logout }) => {
   const setActiveChat = (username) => {
     setActiveConversation(username);
   };
-  
+
   const addOnlineUser = useCallback((id) => {
     setConversations((prev) =>
       prev.map((convo) => {
@@ -149,7 +155,6 @@ const Home = ({ user, logout }) => {
       })
     );
   }, []);
-
 
   // Lifecycle
   useEffect(() => {
