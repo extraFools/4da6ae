@@ -9,7 +9,12 @@ const Message = db.define("message", {
   senderId: {
     type: Sequelize.INTEGER,
     allowNull: false,
-  },
+  }
+  ,
+  readStatus: {
+    type: Sequelize.BOOLEAN,
+    allowNull: true,
+  }
 });
 
 module.exports = Message;
