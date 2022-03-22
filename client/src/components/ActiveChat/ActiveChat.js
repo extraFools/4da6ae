@@ -12,11 +12,14 @@ const useStyles = makeStyles(() => ({
   chatContainer: {
     marginLeft: 41,
     marginRight: 41,
+  },
+  readContainer: {
+    height:'80vh',
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
     justifyContent: 'space-between',
-  },
+  }
 }));
 
 const ActiveChat = ({
@@ -54,7 +57,7 @@ const ActiveChat = ({
           />
           <Box className={classes.chatContainer}>
             {user && (
-              <Box onMouseEnter={handleUpdateReadStatus}>
+              <Box className={classes.readContainer} onMouseEnter={handleUpdateReadStatus}>
                 <Messages
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
