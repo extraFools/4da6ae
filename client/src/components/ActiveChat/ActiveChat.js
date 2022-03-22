@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box } from '@material-ui/core';
 import { Input, Header, Messages } from './index';
@@ -24,6 +24,7 @@ const ActiveChat = ({
   conversations,
   activeConversation,
   postMessage,
+  updateReadStatus,
 }) => {
   const classes = useStyles();
 
@@ -37,6 +38,12 @@ const ActiveChat = ({
     return obj !== {} && obj !== undefined;
   };
 
+  const handleUpdateReadStatus = () => {
+    if(activeConversation && conversation)
+    {
+      updateReadStatus(conversation);
+    }
+  }
   return (
     <Box className={classes.root}>
       {isConversation(conversation) && conversation.otherUser && (
@@ -47,11 +54,12 @@ const ActiveChat = ({
           />
           <Box className={classes.chatContainer}>
             {user && (
-              <>
+              <Box onMouseEnter={handleUpdateReadStatus}>
                 <Messages
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
                   userId={user.id}
+                  updateReadStatus={updateReadStatus}
                 />
                 <Input
                   otherUser={conversation.otherUser}
@@ -59,7 +67,7 @@ const ActiveChat = ({
                   user={user}
                   postMessage={postMessage}
                 />
-              </>
+              </Box>
             )}
           </Box>
         </>
