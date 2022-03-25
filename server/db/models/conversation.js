@@ -3,11 +3,6 @@ const db = require("../db");
 const Message = require("./message");
 
 const Conversation = db.define("conversation", {
-  converstionId: {
-    type: Sequelize.INTEGER,
-    allowNull: false,   
-    unique: true,
-  },
   conversationTitle: {
     type: Sequelize.STRING,
     allowNull: true,
@@ -15,14 +10,14 @@ const Conversation = db.define("conversation", {
 });
 
 //Find conversation given conversation Id 
-// Conversation.findConversation = async function (converationId) {
-//   const conversation = await Conversation.findConversation({
-//     where:{
-//       converationId: converationId
-//     }
-//   });
-//   return conversation;
-// }
+Conversation.findConversation = async function (converationId) {
+  const conversation = await Conversation.findConversation({
+    where:{
+      id: converationId
+    }
+  });
+  return conversation;
+}
 
 // find conversation given two user Ids
 
