@@ -24,6 +24,7 @@ const Sidebar = ({
   conversations = [],
   user,
   setActiveChat,
+  updateReadStatus,
 }) => {
   const classes = useStyles();
 
@@ -37,11 +38,26 @@ const Sidebar = ({
           conversation.otherUser.username.includes(searchTerm)
         )
         .map((conversation) => {
+          const getUnreadMessages = (convo) => {
+            let unreadCount = 0;
+            convo.messages.forEach((message) => {
+              if (message.senderId === convo.otherUser.id) {
+                if (message.readStatus === (false || null)) {
+                  // false or null because seed data is null;
+                  unreadCount++;
+                }
+              }
+            });
+            return unreadCount;
+          }
+          const unreadCount = getUnreadMessages(conversation);
           return (
             <Chat
               conversation={conversation}
               key={conversation.otherUser.username}
               setActiveChat={setActiveChat}
+              updateReadStatus={updateReadStatus}
+              unreadCount={unreadCount}
             />
           );
         })}

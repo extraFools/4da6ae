@@ -12,11 +12,14 @@ const useStyles = makeStyles(() => ({
   chatContainer: {
     marginLeft: 41,
     marginRight: 41,
+  },
+  readContainer: {
+    height:'80vh',
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
     justifyContent: 'space-between',
-  },
+  }
 }));
 
 const ActiveChat = ({
@@ -24,6 +27,7 @@ const ActiveChat = ({
   conversations,
   activeConversation,
   postMessage,
+  updateReadStatus,
 }) => {
   const classes = useStyles();
 
@@ -37,6 +41,12 @@ const ActiveChat = ({
     return obj !== {} && obj !== undefined;
   };
 
+  const handleUpdateReadStatus = () => {
+    if(activeConversation && conversation)
+    {
+      updateReadStatus(conversation);
+    }
+  }
   return (
     <Box className={classes.root}>
       {isConversation(conversation) && conversation.otherUser && (
@@ -47,11 +57,12 @@ const ActiveChat = ({
           />
           <Box className={classes.chatContainer}>
             {user && (
-              <>
+              <Box className={classes.readContainer} onMouseEnter={handleUpdateReadStatus}>
                 <Messages
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
                   userId={user.id}
+                  updateReadStatus={updateReadStatus}
                 />
                 <Input
                   otherUser={conversation.otherUser}
@@ -59,7 +70,7 @@ const ActiveChat = ({
                   user={user}
                   postMessage={postMessage}
                 />
-              </>
+              </Box>
             )}
           </Box>
         </>

@@ -9,11 +9,11 @@ router.post("/", async (req, res, next) => {
       return res.sendStatus(401);
     }
     const senderId = req.user.id;
-    const { recipientId, text, conversationId, sender } = req.body;
+    const { recipientId, text, conversationId, sender, readStatus } = req.body;
 
     // if we already know conversation id, we can save time and just add it to message and return
     if (conversationId) {
-      const message = await Message.create({ senderId, text, conversationId });
+      const message = await Message.create({ senderId, text, conversationId, readStatus });
       return res.json({ message, sender });
     }
     // if we don't have conversation id, find a conversation to make sure it doesn't already exist
@@ -36,11 +36,49 @@ router.post("/", async (req, res, next) => {
       senderId,
       text,
       conversationId: conversation.id,
+      readStatus
     });
     res.json({ message, sender });
   } catch (error) {
     next(error);
   }
 });
+router.patch("/read", async(req, res, next)=> {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    
+    const { conversationId, recipientId } = req.body;
 
+    const conversationAuth = await Conversation.findConversation(req.user.id, recipientId);
+    
+    if(conversationAuth)
+    {
+      if(conversationAuth.id !== conversationId)
+      {
+        return res.sendStatus(403);
+      }
+    }
+
+    await Message.update(
+      { readStatus: "true"},
+      {
+        where: {
+          conversationId: conversationId,
+          senderId: recipientId,
+        }
+      }
+
+    );
+    const response = {
+      conversationId: conversationId,
+      recipientId: recipientId,
+      updatedConversation: true,
+    }
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+})
 module.exports = router;

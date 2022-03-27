@@ -9,7 +9,13 @@ const Message = db.define("message", {
   senderId: {
     type: Sequelize.INTEGER,
     allowNull: false,
-  },
+  }
+  ,
+  readStatus: {
+    type: Sequelize.BOOLEAN,
+    allowNull: true, // Would be false but seed data fails.
+    default:false
+  }
 });
 
 module.exports = Message;
