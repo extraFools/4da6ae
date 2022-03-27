@@ -77,7 +77,7 @@ const Home = ({ user, logout }) => {
   };
 
   const updateMessageReadStatus = async (body) => {
-    const { data } = await axios.post('/api/messages/updatereadstatus', body);
+    const { data } = await axios.patch('/api/messages/read', body);
     return data;
   };
 

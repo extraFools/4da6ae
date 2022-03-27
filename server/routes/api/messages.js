@@ -43,15 +43,14 @@ router.post("/", async (req, res, next) => {
     next(error);
   }
 });
-router.post("/updatereadstatus", async(req, res, next)=> {
+router.patch("/read", async(req, res, next)=> {
   try {
     if (!req.user) {
       return res.sendStatus(401);
     }
-
+    
     const { conversationId, recipientId } = req.body;
 
-    // if we already know conversation id, we can save time and just add it to message and return
     await Message.update(
       { readStatus: "true"},
       {
