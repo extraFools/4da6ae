@@ -28,27 +28,29 @@ const Messages = (props) => {
   const classes = useStyles();
   const { messages, otherUser, userId } = props;
 
-  const lastMessageInConversation = () => {
-    if (messages.length > 0) {
-      if (messages[messages.length - 1].senderId === userId) {
-        if (messages[messages.length - 1].readStatus === true) {
-          return { isUsers: true, isRead: true };
-        }
-        return { isUsers: true, isRead: false };
-      } else {
-        return { isUsers: false, isRead: false };
-      }
-    }
-    return;
+  const lastIndexOfUserMessage = () => {
+    const index = messages.findLastIndex((n) => n.senderId === userId);
+    return index;
   };
-
   return (
     <Box>
-      {messages.map((message) => {
+      {messages.map((message, index) => {
         const time = moment(message.createdAt).format('h:mm');
 
         return message.senderId === userId ? (
-          <SenderBubble key={message.id} text={message.text} time={time} />
+          <>
+            <SenderBubble key={message.id} text={message.text} time={time} />
+            {index === lastIndexOfUserMessage() &&
+            message.readStatus === true ? (
+              <Box className={classes.readStatusBubbleContainer}>
+                <Avatar
+                  alt={otherUser.username}
+                  src={otherUser.photoUrl}
+                  className={classes.avatar}
+                />
+              </Box>
+            ) : null}
+          </>
         ) : (
           <OtherUserBubble
             key={message.id}
@@ -58,21 +60,6 @@ const Messages = (props) => {
           />
         );
       })}
-      {lastMessageInConversation() && lastMessageInConversation().isUsers ? (
-        lastMessageInConversation().isRead ? (
-          <Box className={classes.readStatusBubbleContainer}>
-            <Avatar
-              alt={otherUser.username}
-              src={otherUser.photoUrl}
-              className={classes.avatar}
-            />
-          </Box>
-        ) : (
-          <Box className={classes.readStatusBubbleContainer}>
-            <Box className={classes.unreadStatusBubble}></Box>
-          </Box>
-        )
-      ) : null}
     </Box>
   );
 };
