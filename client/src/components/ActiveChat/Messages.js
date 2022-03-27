@@ -28,17 +28,27 @@ const Messages = (props) => {
   const classes = useStyles();
   const { messages, otherUser, userId } = props;
 
+  // const lastIndexOfUserMessage = () => {
+  //   const index = messages.findLastIndex((n) => n.senderId === userId); //cypress doesnt recognize findLastIndex https://v8.dev/features/finding-in-arrays
+  //   return index;
+  // };
   const lastIndexOfUserMessage = () => {
-    const index = messages.findLastIndex((n) => n.senderId === userId);
+    let index = -1;
+    messages.forEach((message,idx) => {
+      if(message.senderId === userId)
+      {
+        index = idx;
+      }
+    })
     return index;
-  };
+  }
   return (
     <Box>
       {messages.map((message, index) => {
         const time = moment(message.createdAt).format('h:mm');
 
         return message.senderId === userId ? (
-          <>
+          <div key={message.id}>
             <SenderBubble key={message.id} text={message.text} time={time} />
             {index === lastIndexOfUserMessage() &&
             message.readStatus === true ? (
@@ -50,7 +60,7 @@ const Messages = (props) => {
                 />
               </Box>
             ) : null}
-          </>
+          </div>
         ) : (
           <OtherUserBubble
             key={message.id}
