@@ -13,7 +13,8 @@ const Message = db.define("message", {
   ,
   readStatus: {
     type: Sequelize.BOOLEAN,
-    allowNull: true,
+    allowNull: true, // Would be false but seed data fails.
+    default:false
   }
 });
 
