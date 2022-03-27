@@ -23,7 +23,8 @@ const useStyles = makeStyles((theme) => ({
   },
   previewTextUnread:{
     fontWeight: 'bold',
-    letterSpacing: -0.2,
+    fontSize:12 ,
+    letterSpacing: -0.17,
   },
   flex: {
     display: 'flex',
