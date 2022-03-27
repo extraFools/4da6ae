@@ -51,6 +51,16 @@ router.patch("/read", async(req, res, next)=> {
     
     const { conversationId, recipientId } = req.body;
 
+    const conversationAuth = await Conversation.findConversation(req.user.id, recipientId);
+    
+    if(conversationAuth)
+    {
+      if(conversationAuth.id !== conversationId)
+      {
+        return res.sendStatus(403);
+      }
+    }
+
     await Message.update(
       { readStatus: "true"},
       {
